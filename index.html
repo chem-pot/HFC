@@ -1,0 +1,1182 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>수소 연료 전지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=Noto+Serif+KR:wght@400;600;700&family=STIX+Two+Text:ital@1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mint:#5dc2b0;--mint-deep:#23907f;--mint-soft:#e3f5f1;
+  --yellow:#f4c33b;--salmon:#e9966b;--num:#e8843a;
+  --ink:#231f20;--muted:#646b6c;--line:#d9dddc;
+  --paper:#fff;--panel:#f5f8f7;--stage:#fcfdfd;
+  --red:#d9624b;--gray-tag:#98a2a2;
+  --house:#cfe9e4;--house-line:#5fa89b;--cham:#f2faf8;
+  --elec:#7d93a6;--mem:#f6d79a;--mem-line:#d9a94a;
+  --wire:#3d4547;--liq:#d7ecf8;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --mint-deep:#6fd3c1;--mint-soft:#1f3a35;
+    --ink:#e8eceb;--muted:#a3abaa;--line:#3a4443;
+    --paper:#1b2120;--panel:#212928;--stage:#171d1c;
+    --house:#24403b;--house-line:#5fa89b;--cham:#1c2a28;
+    --elec:#8aa0b2;--mem:#6e5a2e;--mem-line:#b28a3a;
+    --wire:#c9d1d0;--liq:#24394a;
+  }
+}
+:root[data-theme="dark"]{
+  --mint-deep:#6fd3c1;--mint-soft:#1f3a35;
+  --ink:#e8eceb;--muted:#a3abaa;--line:#3a4443;
+  --paper:#1b2120;--panel:#212928;--stage:#171d1c;
+  --house:#24403b;--house-line:#5fa89b;--cham:#1c2a28;
+  --elec:#8aa0b2;--mem:#6e5a2e;--mem-line:#b28a3a;
+  --wire:#c9d1d0;--liq:#24394a;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--paper);-webkit-tap-highlight-color:transparent}
+button{font-family:inherit}
+.ch{white-space:nowrap}
+.ch i{font-family:'STIX Two Text',serif;font-style:italic}
+
+.app{height:100dvh;display:flex;flex-direction:column;padding:14px 18px 16px;gap:12px}
+.top{display:flex;align-items:center;gap:18px}
+.badges{display:flex;flex:none}
+.bd{display:grid;place-items:center;width:62px;height:62px;border-radius:50%;font-weight:800;font-size:.95rem;line-height:1.15;text-align:center}
+.bd1{background:var(--mint);color:#fff}
+.bd2{background:var(--yellow);color:#231f20;margin-left:-8px;font-size:.85rem}
+.prog{flex:1}
+.bar{position:relative;height:8px;border-radius:4px;background:var(--line)}
+.fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:4px;background:var(--mint);transition:width .5s}
+.knob{position:absolute;top:50%;left:0;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:var(--paper);border:4px solid var(--mint);transition:left .5s}
+
+.main{flex:1;min-height:0;display:grid;grid-template-columns:300px 1fr;gap:16px}
+.side{background:var(--panel);border-radius:20px;padding:18px 16px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.blk{flex:none}
+.sh{margin:0 0 8px;font-size:1rem;font-weight:800}
+.grp{display:inline-block;margin:6px 0 4px;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:700;background:var(--mint-soft);color:var(--mint-deep)}
+.blist{list-style:none;margin:0;padding:0}
+.blist li{display:flex;align-items:center;gap:8px;min-height:40px;padding:4px 8px;border-radius:12px;font-weight:600;font-size:.95rem;color:var(--muted)}
+.blist li.reach{cursor:pointer;color:var(--ink)}
+.blist li.cur{background:var(--paper);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.blist li.view{background:var(--paper);box-shadow:inset 0 0 0 2px var(--mint)}
+.ck{flex:none;width:20px;height:20px;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center;transition:background .3s,border-color .3s}
+.blist li.done .ck{background:var(--mint);border-color:var(--mint)}
+.blist li.done .ck::after{content:'';width:9px;height:5px;border:solid #fff;border-width:0 0 2.5px 2.5px;transform:translateY(-1px) rotate(-45deg)}
+.read{flex:1;min-height:0;overflow:auto;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.rh{margin:0 0 8px;font-size:.95rem;font-weight:800}
+.rh small{margin-left:6px;font-weight:500;color:var(--muted);font-size:.88rem}
+.rbody p{margin:0 0 10px;font-family:'Noto Serif KR',serif;font-weight:400;font-size:.95rem;line-height:1.8;word-break:keep-all}
+.rbody p.ask{color:var(--muted)}
+.rbody b{font-family:'Noto Sans KR',sans-serif;font-weight:800}
+.rbody .empty{font-family:'Noto Sans KR',sans-serif;color:var(--muted)}
+.fig{margin:4px 0 10px;padding:10px 12px;border-radius:12px;background:var(--paper);border:1px solid var(--line)}
+.fig .figt{margin:0 0 6px;font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:.85rem;color:var(--muted)}
+.fig p{font-size:.92rem;line-height:1.7;margin:0 0 6px}
+.fig .eq{font-family:'Noto Sans KR',sans-serif;font-size:.88rem;color:var(--muted);margin:-2px 0 8px 1.2em}
+.mk{border-radius:4px;transition:background .4s,box-shadow .4s}
+.mk.hit{background:var(--mint-soft);box-shadow:0 2px 0 var(--mint)}
+.mk.pop{animation:mkpop 1.1s}
+@keyframes mkpop{30%{background:rgba(244,195,59,.45)}}
+.qs{border-radius:3px;transition:background .4s,box-shadow .4s}
+.qs.show{background:rgba(244,195,59,.3);box-shadow:0 2px 0 var(--yellow)}
+
+.content{display:flex;flex-direction:column;min-height:0;gap:10px}
+.head h1{margin:0 0 4px;font-size:1.55rem;font-weight:800;letter-spacing:-.01em}
+.goal{margin:0;display:flex;gap:10px;align-items:baseline}
+.gl{flex:none;padding:1px 10px;border-radius:999px;background:var(--mint);color:#fff;font-weight:700;font-size:.85rem}
+.gt{font-family:'Noto Serif KR',serif;font-weight:600;line-height:1.6;word-break:keep-all}
+
+.stage{position:relative;flex:1;min-height:0;background:var(--stage);border:1px solid var(--line);border-radius:22px;overflow:hidden}
+.stage svg{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none}
+.tools{position:absolute;top:12px;right:12px;display:flex;gap:8px;z-index:3}
+.sbtn{min-height:48px;padding:0 18px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font-weight:700;font-size:.95rem;cursor:pointer}
+.sbtn[aria-pressed="true"]{background:var(--mint-soft);border-color:var(--mint);color:var(--mint-deep)}
+.restart{position:absolute;left:12px;bottom:12px;z-index:3}
+.toast{position:absolute;top:14px;left:50%;transform:translate(-50%,-14px);z-index:4;max-width:min(560px,70%);padding:10px 20px;border-radius:999px;background:var(--ink);color:var(--paper);font-weight:700;text-align:center;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;word-break:keep-all}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:5;max-height:78%;overflow:auto;background:var(--paper);border-top:3px solid var(--mint);border-radius:22px 22px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.12);padding:16px 26px 20px;transform:translateY(105%);transition:transform .45s}
+.sheet.open{transform:none}
+.shd{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.shd .sp{flex:1}
+.sheet h3{margin:12px 0 6px;font-size:1rem;font-weight:800;color:var(--mint-deep)}
+.sheet ol{margin:0;padding-left:1.4em}
+.sheet li{margin:0 0 6px;font-family:'Noto Serif KR',serif;font-weight:600;font-size:1.08rem;line-height:1.7;word-break:keep-all}
+.sheet .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.sheet .chip{padding:4px 12px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:.88rem;font-weight:600}
+.sheet .note{margin:14px 0 0;color:var(--muted);font-weight:700}
+
+.panel{flex:none;background:var(--panel);border-radius:20px;padding:12px 20px 14px}
+.prow{display:flex;align-items:center;gap:10px}
+.prow .sp{flex:1}
+.tag{display:inline-block;padding:3px 12px;border-radius:999px;background:var(--salmon);color:#fff;font-weight:700;font-size:.85rem}
+.tag.res{background:var(--mint)}
+.pc{color:var(--muted);font-weight:700;font-size:.9rem}
+.next{min-height:48px;padding:0 24px;border-radius:999px;border:0;background:var(--line);color:var(--muted);font-weight:800;font-size:1rem;cursor:pointer;transition:background .3s,color .3s}
+.next.ready{background:var(--mint);color:#fff}
+.next.blink{animation:blink .45s 2}
+@keyframes blink{50%{transform:scale(1.07);box-shadow:0 0 0 6px rgba(93,194,176,.3)}}
+.stxt{margin:8px 0 2px;display:flex;gap:10px;align-items:baseline;font-family:'Noto Serif KR',serif;font-weight:600;font-size:1.32rem;line-height:1.5;word-break:keep-all}
+.sn{flex:none;color:var(--num);font-family:'Noto Sans KR',sans-serif;font-weight:800}
+.hint{margin:0;padding-left:28px;color:var(--muted);font-size:.95rem;word-break:keep-all}
+
+/* 확인 문제 */
+.quiz{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:20px;background:rgba(20,25,25,.45);opacity:0;pointer-events:none;transition:opacity .3s}
+.quiz.open{opacity:1;pointer-events:auto}
+.qcard{width:min(580px,100%);background:var(--paper);border-radius:22px;padding:22px 26px 20px;box-shadow:0 20px 50px rgba(0,0,0,.25);transform:translateY(16px);transition:transform .3s}
+.quiz.open .qcard{transform:none}
+.qhead{display:flex;align-items:center;gap:10px}
+.qsub{color:var(--muted);font-weight:700}
+.qtext{margin:16px 0 20px;font-family:'Noto Serif KR',serif;font-weight:600;font-size:1.3rem;line-height:1.65;word-break:keep-all}
+.ox{display:flex;gap:20px;justify-content:center}
+.oxb{width:104px;height:104px;border-radius:50%;border:3px solid var(--line);background:var(--paper);font-size:3rem;font-weight:800;cursor:pointer;transition:background .25s,border-color .25s,opacity .25s}
+.oxb[data-a="O"]{color:var(--mint-deep)}
+.oxb[data-a="X"]{color:var(--red)}
+.oxb.wrong{border-color:var(--red);animation:shake .4s}
+.oxb.right{background:var(--mint-soft);border-color:var(--mint)}
+.oxb:disabled{cursor:default;opacity:.35}
+.oxb.right:disabled{opacity:1}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.qfb{min-height:1.6em;margin:16px 0 0;text-align:center;font-weight:700;line-height:1.6;word-break:keep-all}
+.qfb.ok{color:var(--mint-deep)}
+.qfb.no{color:var(--red)}
+.qfoot{display:flex;align-items:center;gap:10px;margin-top:14px}
+.qfoot .sp{flex:1}
+
+/* ===== SVG ===== */
+.scene{transition:opacity .45s}
+.scene.off{opacity:0;pointer-events:none}
+.t{font-family:'Noto Sans KR',sans-serif;fill:var(--ink)}
+.tm{font-family:'Noto Sans KR',sans-serif;fill:var(--muted)}
+.housing{fill:var(--house);stroke:var(--house-line);stroke-width:3}
+.cham{fill:var(--cham)}
+.elec{fill:var(--elec)}
+.mem{fill:var(--mem);stroke:var(--mem-line);stroke-width:2}
+.wire{fill:none;stroke:var(--wire);stroke-width:5;stroke-linejoin:round}
+.pipe{fill:#c9d3d6;stroke:#8c999d;stroke-width:2}
+.valve .vb{fill:var(--paper);stroke:var(--house-line);stroke-width:3}
+.valve .vh{fill:var(--house-line);transition:transform .5s;transform-box:fill-box;transform-origin:center}
+.valve.open .vh{transform:rotate(90deg)}
+.valve .pulse{fill:none;stroke:var(--mint);stroke-width:3;opacity:0}
+.valve.want{cursor:pointer}
+.valve.want .pulse{animation:pulse 1.4s infinite}
+@keyframes pulse{0%{opacity:.9;transform:scale(.85)}100%{opacity:0;transform:scale(1.35)}}
+.valve .pulse{transform-box:fill-box;transform-origin:center}
+.flow{fill:none;stroke:var(--yellow);stroke-width:10;stroke-linecap:round;opacity:0;transition:opacity .5s}
+.flow.on{opacity:.75}
+.flowHead{fill:var(--yellow);opacity:0;transition:opacity .5s}
+.flowHead.on{opacity:.75}
+.bulbGlow{fill:#ffe27a;opacity:0;transition:opacity .6s}
+.bulb.lit .bulbGlow{opacity:.75;animation:flick 2.4s infinite}
+@keyframes flick{50%{opacity:.55}}
+.bulbGlass{fill:#f4f6f6;stroke:#8c999d;stroke-width:2;transition:fill .6s}
+.bulb.lit .bulbGlass{fill:#fff3b0}
+.fil{fill:none;stroke:#8c7a4a;stroke-width:2}
+.bulb.lit .fil{stroke:#e8843a}
+.bulbBase{fill:#9aa4a7}
+
+.hit{fill:transparent;stroke:none;cursor:default}
+.hit.want{cursor:pointer;stroke:var(--mint);stroke-width:3;stroke-dasharray:8 6;animation:dash 1s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-14}}
+.plabel{opacity:0;transition:opacity .4s;pointer-events:none}
+.plabel.show{opacity:1}
+.plabel .ln{stroke:var(--ink);stroke-width:1.5;fill:none}
+.plabel .dot{fill:var(--ink)}
+.plabel text{font-family:'Noto Sans KR',sans-serif;font-weight:800;font-size:19px;fill:var(--ink)}
+.flash{animation:flash .8s}
+@keyframes flash{40%{filter:brightness(1.35)}}
+
+.call{opacity:0;transition:opacity .5s;pointer-events:none}
+.call.show{opacity:1}
+.call .box{fill:var(--paper);stroke:var(--line);stroke-width:1.5;transition:stroke .3s,stroke-width .3s}
+.call.active .box{stroke:var(--num);stroke-width:3}
+.call.active .num{animation:numpop 1.2s 2}
+@keyframes numpop{50%{fill:var(--yellow)}}
+.call .num{fill:var(--num)}
+.call .numt{fill:#fff;font-weight:800;font-size:15px;font-family:'Noto Sans KR',sans-serif}
+.call text.ct{font-family:'Noto Sans KR',sans-serif;font-size:15px;fill:var(--ink)}
+.call .lead{stroke:var(--muted);stroke-width:1.4;stroke-dasharray:3 4;fill:none}
+.eqb .box{fill:var(--mint-soft);stroke:none}
+.eqb text{font-family:'Noto Sans KR',sans-serif;fill:var(--ink)}
+.eqb .eh{font-size:14px;font-weight:700;fill:var(--mint-deep)}
+.eqb .ee{font-size:17px;font-weight:600}
+.ital{font-family:'STIX Two Text',serif;font-style:italic}
+
+.p-h circle{fill:#fff;stroke:#7d8a8d;stroke-width:1.5}
+.p-hp circle{fill:#fff;stroke:var(--mint-deep);stroke-width:2}
+.p-e circle{fill:var(--yellow);stroke:#b88a12;stroke-width:1.2}
+.p-o circle{fill:#e05a4f;stroke:#a53a31;stroke-width:1.5}
+.pt{font-family:'Noto Sans KR',sans-serif;font-weight:800;text-anchor:middle;dominant-baseline:central}
+.pt.d{fill:#3b4446}
+.pt.w{fill:#fff}
+
+.dimmable{transition:opacity .45s}
+#scBat[data-focus="li"] .ssg,#scBat[data-focus="ss"] .lig{opacity:.22;pointer-events:none}
+.casing{fill:var(--paper);stroke:#8c999d;stroke-width:4}
+.liq{fill:var(--liq)}
+.sep{fill:#bfc7c9;opacity:.9}
+.lidot{fill:#e05a4f}
+.gra{fill:none;stroke:#4b7fc4;stroke-width:3;stroke-linecap:round}
+.floaty{fill:#7fb6dd;opacity:.6}
+.cap{font-family:'Noto Sans KR',sans-serif;font-weight:800;font-size:22px;fill:var(--ink);text-anchor:middle}
+.cap2{font-family:'Noto Sans KR',sans-serif;font-weight:600;font-size:16px;fill:var(--muted);text-anchor:middle}
+.layerIn{animation:drop .45s ease-out}
+@keyframes drop{from{transform:translateY(-40px);opacity:0}to{transform:none;opacity:1}}
+.zoomNote{font-family:'Noto Sans KR',sans-serif;font-size:14px;fill:var(--muted)}
+
+@media (max-width:900px),(orientation:portrait){
+  .app{height:auto;min-height:100dvh}
+  .main{grid-template-columns:1fr}
+  .side{padding:12px 14px}
+  .blk{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+  .blist{display:flex;flex-wrap:wrap;gap:4px}
+  .read{max-height:30vh}
+  .stage{flex:none;aspect-ratio:5/3.1;min-height:0}
+  .head h1{font-size:1.3rem}
+  .stxt{font-size:1.15rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="badges"><span class="bd bd1">해 보기</span><span class="bd bd2">조사<br>발표</span></div>
+    <div class="prog"><div class="bar"><div class="fill" id="pfill"></div><div class="knob" id="pknob"></div></div></div>
+  </header>
+
+  <div class="main">
+    <aside class="side">
+      <div class="blk">
+        <h2 class="sh">살펴볼 내용</h2>
+        <span class="grp">수소 연료 전지</span>
+        <ul class="blist">
+          <li data-k="fc1" tabindex="0"><span class="ck"></span>구조</li>
+          <li data-k="fc2" tabindex="0"><span class="ck"></span>(−)극 쪽의 반응</li>
+          <li data-k="fc3" tabindex="0"><span class="ck"></span>(+)극 쪽의 반응</li>
+        </ul>
+        <span class="grp">미래 전지</span>
+        <ul class="blist">
+          <li data-k="li" tabindex="0"><span class="ck"></span>리튬 이온 전지</li>
+          <li data-k="ss" tabindex="0"><span class="ck"></span>전고체 전지</li>
+        </ul>
+      </div>
+      <div class="read" id="read">
+        <h3 class="rh" id="rh">본문</h3>
+        <div class="rbody" id="rbody"></div>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="head">
+        <h1>수소 연료 전지를 산화·환원 반응으로 설명하기</h1>
+        <p class="goal"><span class="gl">목표</span><span class="gt">수소 연료 전지에서 이용되는 산화·환원 반응과 그 반응에 이용된 물질의 역할을 설명할 수 있다.</span></p>
+      </div>
+
+      <div class="stage" id="stage">
+<svg id="svg" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" aria-label="수소 연료 전지와 미래 전지 모형">
+  <defs>
+    <radialGradient id="glowG"><stop offset="0" stop-color="#fff6c2"/><stop offset="1" stop-color="#ffe27a" stop-opacity="0"/></radialGradient>
+  </defs>
+
+  <!-- ===== 수소 연료 전지 ===== -->
+  <g id="scFC" class="scene" transform="translate(0 24)">
+    <!-- 도선과 전구 -->
+    <path class="wire" d="M451 162 V70 H549 V162"/>
+    <g class="bulb" id="bulb">
+      <circle class="bulbGlow" cx="500" cy="46" r="46" fill="url(#glowG)" style="fill:url(#glowG)"/>
+      <rect class="bulbBase" x="490" y="58" width="20" height="13" rx="2"/>
+      <circle class="bulbGlass" cx="500" cy="44" r="18"/>
+      <path class="fil" d="M492 50 l3 -10 l3 8 l4 -8 l3 8 l3 -8"/>
+    </g>
+
+    <!-- 본체 -->
+    <rect class="housing" x="300" y="160" width="400" height="310" rx="14"/>
+    <rect class="cham" x="312" y="172" width="126" height="286" rx="8"/>
+    <rect class="cham" x="562" y="172" width="126" height="286" rx="8"/>
+    <rect class="mem" id="memRect" x="462" y="160" width="76" height="310"/>
+    <rect class="elec" id="negRect" x="440" y="160" width="22" height="310"/>
+    <rect class="elec" id="posRect" x="538" y="160" width="22" height="310"/>
+
+    <!-- 관과 밸브 -->
+    <rect class="pipe" x="360" y="96" width="20" height="66"/>
+    <rect class="pipe" x="620" y="96" width="20" height="66"/>
+    <rect class="pipe" x="620" y="468" width="20" height="64"/>
+    <text class="t" x="370" y="80" text-anchor="middle" font-size="18" font-weight="800">수소 <tspan font-weight="600">H</tspan><tspan font-size="13" dy="5">2</tspan><tspan dy="-5">(</tspan><tspan class="ital">g</tspan><tspan>)</tspan></text>
+    <text class="t" x="630" y="80" text-anchor="middle" font-size="18" font-weight="800">산소 <tspan font-weight="600">O</tspan><tspan font-size="13" dy="5">2</tspan><tspan dy="-5">(</tspan><tspan class="ital">g</tspan><tspan>)</tspan></text>
+    <text class="t" x="630" y="560" text-anchor="middle" font-size="18" font-weight="800">물 <tspan font-weight="600">H</tspan><tspan font-size="13" dy="5">2</tspan><tspan dy="-5">O(</tspan><tspan class="ital">l</tspan><tspan>)</tspan></text>
+
+    <path class="flow" id="flowH" d="M370 176 Q372 214 404 232"/>
+    <path class="flowHead" id="flowHh" d="M398 220 L424 240 L394 244 Z"/>
+    <path class="flow" id="flowO" d="M630 176 Q628 214 596 232"/>
+    <path class="flowHead" id="flowOh" d="M602 220 L576 240 L606 244 Z"/>
+    <path class="flow" id="flowW" d="M630 440 V500"/>
+    <path class="flowHead" id="flowWh" d="M616 496 L630 520 L644 496 Z"/>
+
+    <g class="valve" id="valve-h2" data-act="h2" tabindex="-1">
+      <circle class="pulse" cx="370" cy="122" r="30"/>
+      <circle class="vb" cx="370" cy="122" r="22"/>
+      <rect class="vh" x="352" y="118" width="36" height="8" rx="4"/>
+      <circle cx="370" cy="122" r="34" fill="transparent"/>
+    </g>
+    <g class="valve" id="valve-o2" data-act="o2" tabindex="-1">
+      <circle class="pulse" cx="630" cy="122" r="30"/>
+      <circle class="vb" cx="630" cy="122" r="22"/>
+      <rect class="vh" x="612" y="118" width="36" height="8" rx="4"/>
+      <circle cx="630" cy="122" r="34" fill="transparent"/>
+    </g>
+
+    <!-- 입자 층 -->
+    <g id="parts" pointer-events="none"></g>
+
+    <!-- 이름표 -->
+    <g class="plabel" id="lb-fc-neg"><path class="ln" d="M451 470 V488"/><text x="451" y="508" text-anchor="middle">(−)극</text></g>
+    <g class="plabel" id="lb-fc-pos"><path class="ln" d="M549 470 V488"/><text x="549" y="508" text-anchor="middle">(+)극</text></g>
+    <g class="plabel" id="lb-fc-mem">
+      <text x="500" y="236" text-anchor="middle">전</text><text x="500" y="276" text-anchor="middle">해</text>
+      <text x="500" y="316" text-anchor="middle">질</text><text x="500" y="356" text-anchor="middle">막</text>
+    </g>
+
+    <!-- 눌러서 확인하는 영역 -->
+    <rect class="hit" data-set="fc" data-part="neg" x="428" y="162" width="34" height="306" rx="6"/>
+    <rect class="hit" data-set="fc" data-part="mem" x="464" y="162" width="72" height="306" rx="6"/>
+    <rect class="hit" data-set="fc" data-part="pos" x="538" y="162" width="34" height="306" rx="6"/>
+
+    <!-- 그림 Ⅱ-16 설명 상자(스크립트가 채움) -->
+    <g id="calls"></g>
+  </g>
+
+  <!-- ===== 리튬 이온 전지 · 전고체 전지 ===== -->
+  <g id="scBat" class="scene off" data-focus="li">
+    <g class="lig dimmable">
+      <text class="cap" x="255" y="140">리튬 이온 전지</text>
+      <rect x="64" y="272" width="14" height="56" rx="4" fill="#9aa4a7"/>
+      <rect class="casing" x="78" y="200" width="356" height="200" rx="34"/>
+      <rect class="liq" id="liLiq" x="92" y="214" width="328" height="172" rx="22"/>
+      <g id="liPos"></g>
+      <g id="liNeg"></g>
+      <g id="liFloat"></g>
+      <rect class="sep" id="liSep" x="250" y="214" width="10" height="172"/>
+      <g class="plabel" id="lb-li-pos"><path class="ln" d="M120 188 V222"/><circle class="dot" cx="120" cy="222" r="3"/><text x="120" y="180" text-anchor="middle">(+)극</text></g>
+      <g class="plabel" id="lb-li-elec"><path class="ln" d="M228 188 V250"/><circle class="dot" cx="228" cy="250" r="3"/><text x="230" y="180" text-anchor="middle">액체 전해질</text></g>
+      <g class="plabel" id="lb-li-neg"><path class="ln" d="M390 188 V222"/><circle class="dot" cx="390" cy="222" r="3"/><text x="390" y="180" text-anchor="middle">(−)극</text></g>
+      <g class="plabel" id="lb-li-sep"><path class="ln" d="M255 372 V420"/><circle class="dot" cx="255" cy="372" r="3"/><text x="255" y="444" text-anchor="middle">분리막</text></g>
+      <rect class="hit" data-set="li" data-part="pos" x="92" y="214" width="104" height="172" rx="16"/>
+      <rect class="hit" data-set="li" data-part="elec" x="198" y="214" width="48" height="172"/>
+      <rect class="hit" data-set="li" data-part="elec" x="264" y="214" width="50" height="172"/>
+      <rect class="hit" data-set="li" data-part="sep" x="246" y="214" width="18" height="172"/>
+      <rect class="hit" data-set="li" data-part="neg" x="316" y="214" width="104" height="172" rx="16"/>
+    </g>
+
+    <g class="ssg dimmable">
+      <text class="cap" x="745" y="140">전고체 전지</text>
+      <g id="ssUnit"></g>
+      <g class="plabel" id="lb-ss-pos"><path class="ln" d="M600 215 H618"/><text x="594" y="221" text-anchor="end">(+)극</text></g>
+      <g class="plabel" id="lb-ss-sel"><path class="ln" d="M600 253 H618"/><text x="594" y="259" text-anchor="end">고체 전해질</text></g>
+      <g class="plabel" id="lb-ss-neg"><path class="ln" d="M600 291 H618"/><text x="594" y="297" text-anchor="end">(−)극</text></g>
+      <rect class="hit" data-set="ss" data-part="pos" x="612" y="182" width="268" height="48" rx="6"/>
+      <rect class="hit" data-set="ss" data-part="sel" x="612" y="232" width="268" height="44" rx="6"/>
+      <rect class="hit" data-set="ss" data-part="neg" x="612" y="278" width="268" height="30" rx="6"/>
+      <g id="ssStack"></g>
+    </g>
+  </g>
+</svg>
+        <div class="tools">
+          <button class="sbtn" id="zoomBtn" aria-pressed="false">확대해서 보기</button>
+          <button class="sbtn" id="sheetBtn">정리</button>
+        </div>
+        <button class="sbtn restart" id="restart">처음부터</button>
+        <div class="toast" id="toast" role="status"></div>
+
+        <div class="sheet" id="sheet" aria-hidden="true">
+          <div class="shd"><span class="tag res">정리</span><span class="sp"></span><button class="sbtn" id="sheetClose">접기</button></div>
+          <ol>
+            <li>수소 연료 전지의 각 극에서 일어나는 반응을 화학 반응식으로 나타내고, 산화제와 환원제를 찾아 써 보자.</li>
+            <li>수소 연료 전지가 지속가능한 발전에 어떻게 기여하는지 조사하고 설명해 보자.</li>
+          </ol>
+          <h3>확인</h3>
+          <ol>
+            <li>리튬 이온 전지와 전고체 전지의 구조적 차이점을 설명해 보자.</li>
+          </ol>
+          <p class="note">답은 교과서에 기록하자.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="prow"><span class="tag" id="tag">과정 1</span><span class="pc" id="pc">1 / 6</span><span class="sp"></span><button class="next" id="next">다음 단계</button></div>
+        <p class="stxt"><span class="sn" id="sn">1</span><span id="stext"></span></p>
+        <p class="hint" id="hint"></p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="quiz" id="quiz" aria-hidden="true">
+  <div class="qcard" role="dialog" aria-modal="true" aria-labelledby="qtext">
+    <div class="qhead"><span class="tag res">확인 문제</span><span class="qsub" id="qsub"></span></div>
+    <p class="qtext" id="qtext"></p>
+    <div class="ox"><button class="oxb" data-a="O" aria-label="O">O</button><button class="oxb" data-a="X" aria-label="X">X</button></div>
+    <p class="qfb" id="qfb" role="status"></p>
+    <div class="qfoot"><span class="sp"></span><button class="next ready" id="qGo" hidden>다음 단계로</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ===== 교사용 설정값 ===== */
+const CFG = {
+  speed: 1,          // 입자 움직임 속도 배율 (2로 바꾸면 두 배 빠르게)
+  loopGap: 2600,     // 산소까지 공급한 뒤 연속 작동할 때, 다음 반응이 시작되는 간격(ms)
+  demoSlow: 1.6,     // 과정 2·3에서 입자가 움직이는 속도 (클수록 느리게, 1 = 연속 작동과 같은 빠르기)
+  callHold: 3500,    // 과정 2·3에서 원문자 설명(①~④)이 나온 뒤 다음 번호로 넘어가기 전 멈추는 시간(ms)
+  showEq: true,      // 그림 Ⅱ-16의 반응식([수소의 산화], [산소의 환원])을 화면과 본문에 보여 줄지
+  stackPairs: 3,     // 전고체 전지에서 쌓아 보여 줄 (+)극·(−)극 쌍의 수
+  quizOn: true,      // [다음 단계]를 누를 때 본문 확인 문제(O, X)를 낼지
+  zoomScale: 1.5,    // [확대해서 보기] 배율
+  toastTime: 2400    // 토스트 메시지가 떠 있는 시간(ms)
+};
+
+/* ===== 단계 ===== */
+const STEPS = [
+  { k:'fc1', tag:'과정 1', cls:'', scene:'fc', act:'find', set:'fc',
+    text:'수소 연료 전지의 각 부분을 눌러 이름을 확인한다.',
+    hint:'(−)극, 가운데 막, (+)극을 하나씩 눌러 보자. 누른 부분은 왼쪽 본문에도 표시된다.',
+    ok:'수소 연료 전지의 구조를 모두 확인했다.' },
+  { k:'fc2', tag:'과정 2', cls:'', scene:'fc', act:'h2',
+    text:'(−)극 쪽에 수소를 공급한다.',
+    hint:'수소 밸브를 눌러 수소 분자가 어떻게 되는지 보자.',
+    ok:'수소 이온과 전자가 서로 다른 길로 이동했다.' },
+  { k:'fc3', tag:'과정 3', cls:'', scene:'fc', act:'o2',
+    text:'(+)극 쪽에 산소를 공급한다.',
+    hint:'산소 밸브를 눌러 (+)극 쪽에서 무엇이 생기는지 보자.',
+    ok:'물이 생성되고 전구에 불이 켜졌다.' },
+  { k:'li', tag:'과정 4', cls:'', scene:'bat', focus:'li', act:'find', set:'li',
+    text:'리튬 이온 전지의 각 부분을 눌러 이름을 확인한다.',
+    hint:'색이 다른 부분을 하나씩 눌러 보자. 가운데 얇은 막도 눌러 보자.',
+    ok:'리튬 이온 전지의 구조를 모두 확인했다.' },
+  { k:'ss', tag:'과정 5', cls:'', scene:'bat', focus:'ss', act:'find', set:'ss',
+    text:'전고체 전지의 각 부분을 눌러 이름을 확인한다.',
+    hint:'세 층을 모두 누르면 여러 겹 쌓은 모습이 나타난다.',
+    ok:'전고체 전지를 여러 겹 쌓았다.' },
+  { k:'res', tag:'정리', cls:'res', scene:'fc', act:'sheet',
+    text:'정리 문항을 읽고 답을 교과서에 기록한다.',
+    hint:'왼쪽 목록을 누르면 앞에서 본 그림과 본문을 다시 볼 수 있다.',
+    ok:'' }
+];
+
+/* 눌러서 확인하는 부분 (이름표 문구는 교과서 그림 표기 그대로) */
+const PARTS = {
+  fc: ['neg','mem','pos'],
+  li: ['pos','elec','sep','neg'],
+  ss: ['pos','sel','neg']
+};
+/* 부분을 눌렀을 때 본문에 표시할 구절(data-k) */
+const MKMAP = {
+  fc: { neg:'fneg', mem:'fmem', pos:'fpos' },
+  li: { elec:'elec' },
+  ss: { sel:'sel', pos:'pn', neg:'pn' }
+};
+
+/* ===== 교과서 본문 (원문 그대로) ===== */
+const H2 = '<span class="ch">H<sub>2</sub></span>';
+const EQ1 = `<span class="ch">H<sub>2</sub> → 2H<sup>+</sup> + 2e<sup>−</sup></span>`;
+const EQ2 = `<span class="ch"><sup>1</sup>⁄<sub>2</sub>O<sub>2</sub> + 2H<sup>+</sup> + 2e<sup>−</sup> → H<sub>2</sub>O</span>`;
+const TEXT = {
+  fc1: `<p class="ask">지속가능한 발전을 위해서 미래의 전기 자동차는 어떤 전지를 이용해야 할까?</p>
+<p>지속가능한 발전이란 미래 세대의 환경을 배려하면서, 우리 세대의 생활도 함께 발전시킬 수 있는 개발을 말한다. 이를 위해 각국에서는 기후 협약을 맺고 탄소 배출량을 감소시키기 위해 노력하고 있다. 예를 들어 탄소 배출량을 줄이기 위해 각국은 내연 기관 자동차에서 친환경 자동차로의 전환을 유도하고 있다. 친환경 자동차에 사용되는 수소 연료 전지에 대해 알아보자.</p>
+<p>친환경 자동차에 사용하는 전지로 <b>수소 연료 전지</b>가 있다. <span class="qs" data-q="p1">수소 연료 전지는 일반적인 화학 전지와 달리 외부에서 연료를 공급하여 화학 에너지를 전기 에너지로 변환한다.</span></p>
+<div class="fig"><p class="figt">해 보기 | 수소 연료 전지의 구조</p>
+<p>다음은 수소 연료 전지의 구조를 나타낸 것이다.</p>
+<p class="eq">그림 표기: <span class="mk" data-k="fneg">(−)극</span> · <span class="mk" data-k="fmem">전해질</span> · <span class="mk" data-k="fpos">(+)극</span></p></div>`,
+  fc2: `<p><span class="qs" data-q="p2">수소를 연료로 이용하는 수소 연료 전지는 수소를 산소와 반응시켜 에너지를 얻는 장치로 전기를 생산하는 과정에서 물만 생성되므로 화석 연료를 이용한 발전 방식과 달리 대기 오염 물질과 이산화 탄소를 배출하지 않는다.</span> 수소 연료 전지의 작동 원리는 그림 Ⅱ-16과 같다.</p>
+<div class="fig"><p class="figt">그림 Ⅱ-16 수소 연료 전지의 작동 원리</p>
+<p><span class="mk qs" data-k="c1" data-q="c1">① (−)극에서 수소 분자는 수소 이온과 전자로 분리된다.</span></p>
+<p class="eq" data-eq>[수소의 산화] ${EQ1}</p>
+<p><span class="mk qs" data-k="c2" data-q="c2">② 수소 이온은 전해질 막을 통과하여 환원 전극으로 이동한다.</span></p></div>`,
+  fc3: `<div class="fig"><p class="figt">그림 Ⅱ-16 수소 연료 전지의 작동 원리</p>
+<p><span class="mk qs" data-k="c3" data-q="c3">③ (+)극에서 산소 분자는 산소 원자로 분리된다.</span></p>
+<p><span class="mk qs" data-k="c4" data-q="c4">④ 산소 원자, 수소 이온, 전자가 결합하여 물이 생성된다.</span></p>
+<p class="eq" data-eq>[산소의 환원] ${EQ2}</p></div>`,
+  li: `<p><span class="qs" data-q="l1">현재 많이 사용하는 리튬 이온 전지는 그림 Ⅱ-17과 같이 <span class="mk" data-k="elec">액체 전해질</span>을 이용하여 에너지 효율이 좋지만, 수명이 짧고 고열에 폭발할 위험이 있다.</span></p>`,
+  ss: `<p>이를 대체하는 전지로 주목받고 있는 <b>전고체 전지</b>는 그림 Ⅱ-18과 같이 <span class="mk" data-k="sel">전해질이 고체로 되어 있고</span> 전해질 분리막이 없으며 <span class="qs" data-q="s1">인화성 물질을 포함하지 않아 충격에 의한 폭발 위험이 낮아 안전하다.</span> <span class="qs" data-q="s2">또 전지 한 개에 <span class="mk" data-k="pn">(+)극과 (−)극</span>을 <span class="mk" data-k="stack">교대로 여러 겹 쌓을 수 있어 대용량으로 만들 수 있으므로</span> 전기차의 주행 거리를 향상시킬 수 있다.</span></p>`
+};
+const READ_NAME = { fc1:'수소 연료 전지의 구조', fc2:'(−)극 쪽의 반응', fc3:'(+)극 쪽의 반응', li:'리튬 이온 전지', ss:'전고체 전지' };
+
+/* ===== 확인 문제 (전지마다 둘 중 하나가 무작위로 나온다) =====
+   ref = 틀렸을 때 본문에 표시할 문장(data-q) */
+const QUIZ = {
+  fc1: [
+    { s:'수소 연료 전지는 외부에서 연료를 공급하여 화학 에너지를 전기 에너지로 변환한다.', a:'O', ref:'p1', ex:'수소 연료 전지는 일반적인 화학 전지와 달리 연료를 외부에서 공급한다.' },
+    { s:'수소 연료 전지는 일반적인 화학 전지처럼 전지 안에 넣어 둔 물질만으로 작동하며, 연료를 공급하지 않는다.', a:'X', ref:'p1', ex:'수소 연료 전지는 외부에서 연료(수소)를 공급하여 작동한다.' }
+  ],
+  fc2: [
+    { s:'수소 이온은 전해질 막을 통과하여 (+)극 쪽으로 이동한다.', a:'O', ref:'c2', ex:'수소 이온은 전해질 막을 지나 환원 전극인 (+)극 쪽으로 간다.' },
+    { s:'전자는 수소 이온과 함께 전해질 막을 통과하여 (+)극 쪽으로 이동한다.', a:'X', ref:'c2', ex:'전해질 막을 통과하는 것은 수소 이온이다. 전자는 바깥의 도선을 따라 이동한다.' }
+  ],
+  fc3: [
+    { s:'(+)극에서 산소 분자는 산소 원자로 분리된다.', a:'O', ref:'c3', ex:'그림 Ⅱ-16의 ③ 과정이다.' },
+    { s:'물은 (−)극 쪽에서 생성된다.', a:'X', ref:'c4', ex:'산소 원자, 수소 이온, 전자가 만나는 (+)극 쪽에서 물이 생성된다.' }
+  ],
+  li: [
+    { s:'리튬 이온 전지는 액체 전해질을 이용하여 에너지 효율이 좋다.', a:'O', ref:'l1', ex:'다만 수명이 짧고 고열에 폭발할 위험이 있다.' },
+    { s:'리튬 이온 전지는 수명이 길고 고열에도 폭발할 위험이 없다.', a:'X', ref:'l1', ex:'리튬 이온 전지는 수명이 짧고 고열에 폭발할 위험이 있다.' }
+  ],
+  ss: [
+    { s:'전고체 전지는 인화성 물질을 포함하지 않아 충격에 의한 폭발 위험이 낮다.', a:'O', ref:'s1', ex:'그래서 전고체 전지는 안전하다.' },
+    { s:'전고체 전지는 대용량으로 만들기 어려워 전기차의 주행 거리가 짧아진다.', a:'X', ref:'s2', ex:'(+)극과 (−)극을 여러 겹 쌓아 대용량으로 만들 수 있어 주행 거리를 늘릴 수 있다.' }
+  ]
+};
+
+/* ===== 그림 Ⅱ-16 설명 상자 ===== */
+const CALLS = {
+  c1:{ x:22,  y:160, w:272, lines:['(−)극에서 수소 분자는','수소 이온과 전자로 분리된다.'], lead:'M294 200 L412 250' },
+  c2:{ x:22,  y:372, w:272, lines:['수소 이온은 전해질 막을','통과하여 환원 전극으로','이동한다.'], lead:'M294 410 L486 410' },
+  c3:{ x:706, y:160, w:272, lines:['(+)극에서 산소 분자는','산소 원자로 분리된다.'], lead:'M706 200 L608 300' },
+  c4:{ x:706, y:296, w:272, lines:['산소 원자, 수소 이온, 전자가','결합하여 물이 생성된다.'], lead:'M706 336 L606 386' }
+};
+const EQS = {
+  c1:{ x:22,  y:262, head:'[수소의 산화]', eq:'H_2 ⟶ 2H^+ + 2e^−' },
+  c4:{ x:706, y:394, head:'[산소의 환원]', eq:'½O_2 + 2H^+ + 2e^− ⟶ H_2O' }
+};
+
+/* ===== 공통 ===== */
+const $ = s => document.querySelector(s);
+const NS = 'http://www.w3.org/2000/svg';
+const svg = $('#svg');
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function el(tag, attrs, parent){
+  const e = document.createElementNS(NS, tag);
+  for (const k in (attrs || {})) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+/* 화학식 문자열을 SVG text에 넣는다: _숫자 = 아래 첨자, ^기호 = 위 첨자 */
+function chemInto(t, str, small){
+  const re = /(_\d+)|(\^[\d]*[+−-])/g;
+  let last = 0, off = 0, m;
+  const add = (txt, dy, sz) => {
+    const s = el('tspan', {}, t); s.textContent = txt;
+    if (dy) s.setAttribute('dy', dy);
+    if (sz) s.setAttribute('font-size', sz);
+  };
+  while ((m = re.exec(str))){
+    if (m.index > last){ add(str.slice(last, m.index), off ? -off : 0); off = 0; }
+    if (m[1]){ add(m[1].slice(1), 5 - off, small); off = 5; }
+    else { add(m[2].slice(1), -7 - off, small); off = -7; }
+    last = re.lastIndex;
+  }
+  if (last < str.length) add(str.slice(last), off ? -off : 0);
+}
+
+let toastT = 0;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), CFG.toastTime);
+}
+
+/* ===== 그림 Ⅱ-16 상자 만들기 ===== */
+(function buildCalls(){
+  const g = $('#calls');
+  for (const id in CALLS){
+    const c = CALLS[id];
+    const h = 22 + c.lines.length * 24;
+    const cg = el('g', { class:'call', id:'call-'+id }, g);
+    el('path', { class:'lead', d:c.lead }, cg);
+    el('rect', { class:'box', x:c.x, y:c.y, width:c.w, height:h, rx:12 }, cg);
+    el('circle', { class:'num', cx:c.x + 20, cy:c.y + 22, r:12 }, cg);
+    const nt = el('text', { class:'numt', x:c.x + 20, y:c.y + 27, 'text-anchor':'middle' }, cg);
+    nt.textContent = '①②③④'['c1c2c3c4'.indexOf(id) / 2];
+    c.lines.forEach((ln, i) => {
+      const t = el('text', { class:'ct', x:c.x + 40, y:c.y + 28 + i * 24 }, cg);
+      t.textContent = ln;
+    });
+  }
+  for (const id in EQS){
+    const q = EQS[id];
+    const eg = el('g', { class:'call eqb', id:'eq-'+id, 'data-eq':'' }, g);
+    el('rect', { class:'box', x:q.x, y:q.y, width:272, height:62, rx:12 }, eg);
+    const th = el('text', { class:'eh', x:q.x + 136, y:q.y + 22, 'text-anchor':'middle' }, eg); th.textContent = q.head;
+    const te = el('text', { class:'ee', x:q.x + 136, y:q.y + 48, 'text-anchor':'middle' }, eg);
+    chemInto(te, q.eq, 12);
+  }
+})();
+function showCall(id, on = true){
+  document.querySelectorAll('.call.active').forEach(x => x.classList.remove('active'));
+  const c = $('#call-'+id); if (c){ c.classList.toggle('show', on); if (on) c.classList.add('active'); }
+  const e = $('#eq-'+id); if (e) e.classList.toggle('show', on && CFG.showEq);
+}
+
+/* ===== 리튬 이온 전지·전고체 전지 그림 ===== */
+const SLAB = { pos:['#5b8ad6','#4569ad','#86aae6'], sel:['#6cbf5d','#4f9a43','#94d488'], neg:['#d9644f','#b14a37','#e88d7c'] };
+(function buildBat(){
+  const pos = $('#liPos');
+  for (let x = 104; x <= 188; x += 14)
+    for (let y = 226; y <= 374; y += 14)
+      el('circle', { class:'lidot', cx:x + ((y / 14) % 2 ? 0 : 5), cy:y, r:5 }, pos);
+  const neg = $('#liNeg');
+  for (let x = 330; x <= 404; x += 18)
+    for (let y = 228; y <= 362; y += 34)
+      el('path', { class:'gra', d:`M${x} ${y} q6 6 0 12 q-6 6 0 12` }, neg);
+  const fl = $('#liFloat');
+  [[214,250],[232,330],[288,270],[300,350],[226,296],[292,226]].forEach(([x,y], i) => {
+    const c = el('circle', { class:'floaty', cx:x, cy:y, r:4 }, fl);
+    if (!reduceMotion){
+      const a = el('animateTransform', { attributeName:'transform', type:'translate', values:`0 0; ${i%2?6:-6} ${i%3?-8:8}; 0 0`, dur:(3 + i * .4) + 's', repeatCount:'indefinite' }, c);
+    }
+  });
+  drawSlab($('#ssUnit'), 620, [['pos',184,46],['sel',230,46],['neg',276,30]], 240, true);
+})();
+/* layers: [종류, 위쪽 y, 두께] — 아래층부터 그려야 겹침이 자연스럽다 */
+function drawSlab(g, x, layers, w, withTop){
+  const dx = 24, dy = 16;
+  const sorted = layers.slice().sort((a, b) => b[1] - a[1]);
+  sorted.forEach(([k, y, h]) => {
+    const c = SLAB[k];
+    const lg = el('g', { 'data-layer':k }, g);
+    el('rect', { x, y, width:w, height:h, fill:c[0] }, lg);
+    el('polygon', { points:`${x+w},${y} ${x+w+dx},${y-dy} ${x+w+dx},${y+h-dy} ${x+w},${y+h}`, fill:c[1] }, lg);
+  });
+  if (withTop){
+    const [k, y] = layers.reduce((a, b) => (b[1] < a[1] ? b : a));
+    el('polygon', { points:`${x},${y} ${x+dx},${y-dy} ${x+w+dx},${y-dy} ${x+w},${y}`, fill:SLAB[k][2] }, g);
+  }
+}
+
+/* ===== 입자 ===== */
+let gen = 0;
+/* 입자 움직임과 멈춤은 학습 내용이므로 기기의 '동작 줄이기' 설정과 상관없이 재생한다 */
+const sleep = ms => new Promise(r => setTimeout(r, ms / CFG.speed));
+function particle(kind, x, y){
+  const g = el('g', { class:'p-'+kind }, $('#parts'));
+  const p = { g, x, y, kind };
+  if (kind === 'h2'){
+    [-9, 9].forEach(dx => { const c = el('g', { class:'p-h' }, g); el('circle', { cx:dx, cy:0, r:12 }, c); });
+    [-9, 9].forEach(dx => { const t = el('text', { class:'pt d', x:dx, y:0, 'font-size':13 }, g); t.textContent = 'H'; });
+  } else if (kind === 'hp'){
+    const c = el('g', { class:'p-hp' }, g); el('circle', { r:12 }, c);
+    const t = el('text', { class:'pt d', x:0, y:0, 'font-size':12 }, g); t.textContent = 'H⁺';
+  } else if (kind === 'e'){
+    const c = el('g', { class:'p-e' }, g); el('circle', { r:9 }, c);
+    const t = el('text', { class:'pt d', x:0, y:0, 'font-size':10 }, g); t.textContent = 'e⁻';
+  } else if (kind === 'o'){
+    const c = el('g', { class:'p-o' }, g); el('circle', { r:14 }, c);
+    const t = el('text', { class:'pt w', x:0, y:0, 'font-size':13 }, g); t.textContent = 'O';
+  } else if (kind === 'o2'){
+    [-11, 11].forEach(dx => { const c = el('g', { class:'p-o' }, g); el('circle', { cx:dx, cy:0, r:14 }, c); });
+    [-11, 11].forEach(dx => { const t = el('text', { class:'pt w', x:dx, y:0, 'font-size':13 }, g); t.textContent = 'O'; });
+  } else if (kind === 'h2o'){
+    [[-15, 12], [15, 12]].forEach(([dx, dy]) => { const c = el('g', { class:'p-h' }, g); el('circle', { cx:dx, cy:dy, r:9 }, c); });
+    const o = el('g', { class:'p-o' }, g); el('circle', { r:14 }, o);
+    const t = el('text', { class:'pt w', x:0, y:0, 'font-size':13 }, g); t.textContent = 'O';
+    [[-15, 13], [15, 13]].forEach(([dx, dy]) => { const s = el('text', { class:'pt d', x:dx, y:dy, 'font-size':10 }, g); s.textContent = 'H'; });
+  }
+  place(p);
+  return p;
+}
+function place(p){ p.g.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`); }
+/* 꺾은선 경로를 따라 움직인다. 처음부터 다시 하면(gen 변경) false로 끝난다 */
+function tween(p, pts, dur){
+  const myGen = gen;
+  return new Promise(res => {
+    const path = [[p.x, p.y], ...pts];
+    const seg = []; let total = 0;
+    for (let i = 1; i < path.length; i++){
+      const d = Math.hypot(path[i][0] - path[i-1][0], path[i][1] - path[i-1][1]);
+      seg.push(d); total += d;
+    }
+    const D = dur / CFG.speed;
+    const t0 = performance.now();
+    const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    function f(now){
+      if (myGen !== gen){ res(false); return; }
+      const t = Math.min(1, (now - t0) / D);
+      let d = ease(t) * total, i = 0;
+      while (i < seg.length - 1 && d > seg[i]){ d -= seg[i]; i++; }
+      const r = seg[i] ? Math.min(1, d / seg[i]) : 1;
+      p.x = path[i][0] + (path[i+1][0] - path[i][0]) * r;
+      p.y = path[i][1] + (path[i+1][1] - path[i][1]) * r;
+      place(p);
+      if (t < 1) requestAnimationFrame(f); else res(true);
+    }
+    requestAnimationFrame(f);
+  });
+}
+function fadeOut(p, ms = 500){
+  p.g.style.transition = `opacity ${ms}ms`; p.g.style.opacity = 0;
+  setTimeout(() => p.g.remove(), ms);
+}
+const wirePath = y => [[451, 162], [451, 70], [549, 70], [549, y]];
+
+/* (−)극 쪽: 수소 분자 → 수소 이온 + 전자 */
+async function negSide(slots, onSplit){
+  const myGen = gen;
+  const hp = [], es = [];
+  await Promise.all(slots.map(async (y, i) => {
+    await sleep(i * 380);
+    if (myGen !== gen) return;
+    const m = particle('h2', 370, 100);
+    if (!await tween(m, [[370, 184], [410, y]], 1300)) return;
+    m.g.remove();
+    const a = particle('hp', 424, y - 15), b = particle('hp', 424, y + 15);
+    const c = particle('e', 451, y - 15), d = particle('e', 451, y + 15);
+    hp.push(a, b); es.push(c, d);
+    if (onSplit) onSplit();
+  }));
+  return { hp, es };
+}
+/* 수소 이온은 전해질 막으로, 전자는 도선으로 */
+async function crossOver(hp, es, onCross){
+  if (onCross) setTimeout(onCross, 350 / CFG.speed);
+  await Promise.all([
+    ...hp.map(h => tween(h, [[500, h.y], [528, h.y]], 1300)),
+    ...es.map(e => tween(e, wirePath(e.y), 1700))
+  ]);
+}
+/* (+)극 쪽: 산소 분자 → 산소 원자, 산소 원자 + 수소 이온 2 + 전자 2 → 물 */
+async function posSide(slots, hp, es, onSplit, onWater){
+  const myGen = gen;
+  const m = particle('o2', 630, 100);
+  if (!await tween(m, [[630, 184], [606, (slots[0] + slots[1]) / 2]], 1300)) return;
+  m.g.remove();
+  const os = slots.map(y => particle('o', 606, (slots[0] + slots[1]) / 2));
+  await Promise.all(os.map((o, i) => tween(o, [[590, slots[i]]], 700)));
+  if (myGen !== gen) return;
+  if (onSplit) onSplit();
+  await sleep(500);
+  await Promise.all(slots.map(async (y, i) => {
+    const mine = hp.filter(h => Math.abs(h.y - y) < 30);
+    const mye = es.filter(e => Math.abs(e.y - y) < 30);
+    await Promise.all([...mine, ...mye].map(q => tween(q, [[586, y]], 800)));
+    if (myGen !== gen) return;
+    [...mine, ...mye].forEach(q => q.g.remove());
+    os[i].g.remove();
+    const w = particle('h2o', 590, y);
+    if (onWater) onWater();
+    await sleep(300);
+    if (!await tween(w, [[640, Math.min(y + 30, 430)], [630, 448], [630, 540]], 1700)) return;
+    fadeOut(w, 400);
+  }));
+}
+
+/* ===== 상태 ===== */
+let step = 0, done = false, busy = false;
+let S;
+function freshState(){
+  S = { found:{ fc:new Set(), li:new Set(), ss:new Set() }, h2Done:false, o2Done:false, stacked:false, wait:null, completed:new Set() };
+}
+freshState();
+let scene = 'fc', loopOn = false, loopT = 0, loopK = 0;
+let quizPick = {}, quizPassed = {}, quizK = null, quizLock = false;
+
+function clearParticles(){ $('#parts').innerHTML = ''; }
+function setFlow(id, on){ $('#'+id).classList.toggle('on', on); $('#'+id+'h').classList.toggle('on', on); }
+const LOOPSLOTS = [[236, 360], [280, 404], [256, 430], [214, 336]];
+function startLoop(){
+  if (loopOn) return;
+  loopOn = true;
+  $('#bulb').classList.add('lit');
+  setFlow('flowH', true); setFlow('flowO', true); setFlow('flowW', true);
+  const run = async () => {
+    if (!loopOn || scene !== 'fc') return;
+    const slots = LOOPSLOTS[loopK++ % LOOPSLOTS.length];
+    loopT = setTimeout(run, CFG.loopGap / CFG.speed);
+    const myGen = gen;
+    const { hp, es } = await negSide(slots);
+    if (myGen !== gen) return;
+    await crossOver(hp, es);
+    if (myGen !== gen) return;
+    await posSide(slots, hp, es);
+  };
+  run();
+}
+function stopLoop(){
+  loopOn = false; clearTimeout(loopT);
+  gen++; clearParticles();
+}
+
+function setScene(sc, focus){
+  if (focus) $('#scBat').dataset.focus = focus;
+  if (sc === scene){ if (sc === 'fc' && S.o2Done) startLoop(); applyZoom(); return; }
+  scene = sc;
+  $('#scFC').classList.toggle('off', sc !== 'fc');
+  $('#scBat').classList.toggle('off', sc !== 'bat');
+  if (sc === 'fc'){ if (S.o2Done) startLoop(); }
+  else { stopLoop(); }
+  applyZoom();
+}
+
+/* ===== 본문 ===== */
+let readK = null;
+const reached = k => STEPS.findIndex(s => s.k === k) <= step;
+function renderRead(k){
+  readK = k;
+  const rb = $('#rbody');
+  if (k === 'res'){
+    $('#rh').innerHTML = '본문';
+    rb.innerHTML = '<p class="empty">목록에서 항목을 눌러 그림과 본문을 다시 볼 수 있다.</p>';
+  } else {
+    $('#rh').innerHTML = `본문<small>${READ_NAME[k]}</small>`;
+    rb.innerHTML = TEXT[k];
+    if (!CFG.showEq) rb.querySelectorAll('[data-eq]').forEach(e => e.remove());
+    const set = { fc1:'fc', li:'li', ss:'ss' }[k];
+    if (set) S.found[set].forEach(pid => markHit(MKMAP[set][pid], false));
+    if (k === 'fc2' && S.h2Done) ['c1','c2'].forEach(c => markHit(c, false));
+    if (k === 'fc3' && S.o2Done) ['c3','c4'].forEach(c => markHit(c, false));
+    if (k === 'ss' && S.stacked) markHit('stack', false);
+  }
+  $('#read').scrollTop = 0;
+  document.querySelectorAll('.blist li').forEach(li => {
+    li.classList.toggle('view', li.dataset.k === k && k !== STEPS[step].k);
+    li.classList.toggle('reach', reached(li.dataset.k));
+  });
+}
+function markHit(key, pop = true){
+  if (!key) return;
+  const ms = $('#rbody').querySelectorAll(`.mk[data-k="${key}"]`);
+  ms.forEach(m => { m.classList.add('hit'); if (pop){ m.classList.remove('pop'); void m.offsetWidth; m.classList.add('pop'); } });
+  if (pop && ms[0]) ms[0].scrollIntoView({ block:'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+}
+function markRead(k, key){
+  if (readK !== k) renderRead(k);
+  markHit(key);
+}
+/* 목록에서 지나온 항목을 누르면 본문(정리 단계에서는 그림도) 다시 보기 */
+const SCENE_OF = { fc1:['fc'], fc2:['fc'], fc3:['fc'], li:['bat','all'], ss:['bat','all'] };
+document.querySelectorAll('.blist li').forEach(li => {
+  const go = () => {
+    if (!reached(li.dataset.k)){ toast('아직 살펴보지 않은 내용이다.'); return; }
+    renderRead(li.dataset.k);
+    if (STEPS[step].act === 'sheet'){ const [sc, f] = SCENE_OF[li.dataset.k]; setScene(sc, f); setSheet(false); }
+  };
+  li.addEventListener('click', go);
+  li.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } });
+});
+
+/* ===== 눌러서 이름 확인 ===== */
+document.querySelectorAll('.hit').forEach(h => h.addEventListener('click', () => {
+  const st = STEPS[step];
+  const set = h.dataset.set, pid = h.dataset.part;
+  const label = $(`#lb-${set}-${pid}`);
+  if (st.act !== 'find' || st.set !== set){
+    if (S.found[set].has(pid)){ flashLabel(label); }
+    return;
+  }
+  if (!S.found[set].has(pid)){
+    S.found[set].add(pid);
+    label.classList.add('show');
+  }
+  flashPart(set, pid);
+  markRead(st.k, MKMAP[set][pid]);
+  updateWants();
+  if (S.found[set].size === PARTS[set].length && !done){
+    if (set === 'ss') buildStack(); else complete();
+  }
+}));
+function flashLabel(l){ l.classList.remove('flash'); void l.getBBox(); l.classList.add('flash'); }
+function flashPart(set, pid){
+  const map = { fc:{ neg:'#negRect', mem:'#memRect', pos:'#posRect' }, li:{ pos:'#liPos', elec:'#liLiq', sep:'#liSep', neg:'#liNeg' }, ss:{} };
+  let t = map[set][pid] ? $(map[set][pid]) : $(`#ssUnit [data-layer="${pid}"]`);
+  if (!t) return;
+  t.classList.remove('flash'); void t.getBBox(); t.classList.add('flash');
+}
+function updateWants(){
+  const st = STEPS[step];
+  document.querySelectorAll('.hit').forEach(h => {
+    h.classList.toggle('want', !done && st.act === 'find' && st.set === h.dataset.set && !S.found[h.dataset.set].has(h.dataset.part));
+  });
+  $('#valve-h2').classList.toggle('want', st.act === 'h2' && !S.h2Done && !busy);
+  $('#valve-o2').classList.toggle('want', st.act === 'o2' && !S.o2Done && !busy);
+}
+
+/* 전고체 전지: 여러 겹 쌓기 */
+async function buildStack(){
+  busy = true;
+  const g = $('#ssStack'); g.innerHTML = '';
+  const myGen = gen;
+  const arrow = el('g', {}, g);
+  el('path', { d:'M745 322 V356', stroke:'var(--muted)', 'stroke-width':4, fill:'none' }, arrow);
+  el('path', { d:'M733 350 L745 368 L757 350 Z', fill:'var(--muted)' }, arrow);
+  const order = [];
+  for (let i = 0; i < CFG.stackPairs; i++){ order.push('pos','sel','neg'); if (i < CFG.stackPairs - 1) order.push('sel'); }
+  const EH = 12, LH = 16;
+  const H = order.reduce((s, k) => s + (k === 'sel' ? LH : EH), 0);
+  let y = 548 - H;
+  const layers = order.map(k => { const h = k === 'sel' ? LH : EH; const L = [k, y, h]; y += h; return L; });
+  /* 아래층부터 한 겹씩 쌓는다 */
+  for (let i = layers.length - 1; i >= 0; i--){
+    if (myGen !== gen) return;
+    const lg = el('g', { class:'layerIn' }, g);
+    drawSlab(lg, 632, [layers[i]], 216, i === 0);
+    await sleep(160);
+  }
+  if (myGen !== gen) return;
+  const cap = el('text', { class:'cap2', x:756, y:580 }, g); cap.textContent = '여러 겹 쌓은 모습';
+  S.stacked = true; busy = false;
+  markRead('ss', 'stack');
+  complete();
+}
+
+/* ===== 밸브 ===== */
+/* 과정 2·3 시연: 원문자 하나를 보여 주고 callHold만큼 멈춘 뒤 다음 번호로 */
+async function openH2(){
+  if (STEPS[step].act !== 'h2' || S.h2Done || busy) return;
+  busy = true; updateWants();
+  $('#valve-h2').classList.add('open'); setFlow('flowH', true);
+  const myGen = gen, D = CFG.demoSlow;
+  const slots = [250, 380];
+  /* 수소 분자가 (−)극으로 들어온다 */
+  const ms = slots.map(() => particle('h2', 370, 100));
+  ms.forEach(m => m.g.style.opacity = 0);
+  await Promise.all(ms.map(async (m, i) => {
+    await sleep(i * 600 * D);
+    m.g.style.opacity = 1;
+    await tween(m, [[370, 184], [410, slots[i]]], 1600 * D);
+  }));
+  if (myGen !== gen) return;
+  await sleep(500 * D);
+  if (myGen !== gen) return;
+  /* ① 수소 분자 → 수소 이온 + 전자 */
+  const hp = [], es = [];
+  ms.forEach((m, i) => {
+    const y = slots[i]; m.g.remove();
+    hp.push(particle('hp', 424, y - 15), particle('hp', 424, y + 15));
+    es.push(particle('e', 451, y - 15), particle('e', 451, y + 15));
+  });
+  setFlow('flowH', false);
+  showCall('c1'); markRead('fc2', 'c1');
+  await sleep(CFG.callHold);
+  if (myGen !== gen) return;
+  /* ② 수소 이온은 전해질 막을 지나고, 전자는 도선을 따라 이동 */
+  showCall('c2'); markRead('fc2', 'c2');
+  await sleep(400 * D);
+  await Promise.all([
+    ...hp.map(h => tween(h, [[500, h.y], [528, h.y]], 2600 * D)),
+    ...es.map(e => tween(e, wirePath(e.y), 3000 * D))
+  ]);
+  if (myGen !== gen) return;
+  await sleep(CFG.callHold / 2);
+  if (myGen !== gen) return;
+  S.wait = { hp, es, slots };
+  S.h2Done = true; busy = false;
+  complete();
+}
+async function openO2(){
+  if (STEPS[step].act !== 'o2' || S.o2Done || busy) return;
+  busy = true; updateWants();
+  $('#valve-o2').classList.add('open'); setFlow('flowO', true);
+  const myGen = gen, D = CFG.demoSlow;
+  const { hp, es, slots } = S.wait;
+  const mid = (slots[0] + slots[1]) / 2;
+  /* 산소 분자가 (+)극으로 들어온다 */
+  const m = particle('o2', 630, 100);
+  if (!await tween(m, [[630, 184], [606, mid]], 1800 * D)) return;
+  await sleep(500 * D);
+  if (myGen !== gen) return;
+  /* ③ 산소 분자 → 산소 원자 */
+  m.g.remove();
+  const os = slots.map(() => particle('o', 606, mid));
+  setFlow('flowO', false);
+  showCall('c3'); markRead('fc3', 'c3');
+  await Promise.all(os.map((o, i) => tween(o, [[590, slots[i]]], 1200 * D)));
+  if (myGen !== gen) return;
+  await sleep(CFG.callHold);
+  if (myGen !== gen) return;
+  /* ④ 산소 원자 + 수소 이온 + 전자 → 물 */
+  showCall('c4'); markRead('fc3', 'c4');
+  await sleep(400 * D);
+  await Promise.all([...hp, ...es].map(q => {
+    const y = slots[Math.abs(q.y - slots[0]) < 40 ? 0 : 1];
+    return tween(q, [[586, y]], 1800 * D);
+  }));
+  if (myGen !== gen) return;
+  [...hp, ...es].forEach(q => q.g.remove());
+  const ws = slots.map((y, i) => { os[i].g.remove(); return particle('h2o', 590, y); });
+  $('#bulb').classList.add('lit');
+  await sleep(CFG.callHold);
+  if (myGen !== gen) return;
+  /* 생성된 물이 빠져나가고, 연속 작동을 시작한다 */
+  setFlow('flowW', true);
+  ws.forEach((w, i) => tween(w, [[640, Math.min(slots[i] + 30, 430)], [630, 448], [630, 540]], 1700 * D).then(ok => ok && fadeOut(w, 400)));
+  S.wait = null; S.o2Done = true; busy = false;
+  $('#valve-h2').classList.add('open');
+  setTimeout(() => { if (myGen === gen) startLoop(); }, 1200 * D / CFG.speed);
+  complete();
+}
+$('#valve-h2').addEventListener('click', () => {
+  if (STEPS[step].act === 'o2' && !S.o2Done) toast('이번에는 산소 밸브를 열자.');
+  openH2();
+});
+$('#valve-o2').addEventListener('click', () => {
+  if (STEPS[step].act === 'h2' && !S.h2Done) toast('먼저 수소 밸브를 열자.');
+  openO2();
+});
+
+/* ===== 확대 ===== */
+let zoomed = false, vb = [0, 0, 1000, 600], vbAnim = 0;
+function zoomCenter(){
+  if (scene === 'fc') return [500, 300];
+  const f = $('#scBat').dataset.focus;
+  return f === 'li' ? [255, 300] : f === 'ss' ? [745, 330] : [500, 300];
+}
+function applyZoom(){
+  let target = [0, 0, 1000, 600];
+  if (zoomed){
+    const w = 1000 / CFG.zoomScale, h = 600 / CFG.zoomScale, [cx, cy] = zoomCenter();
+    target = [Math.max(0, Math.min(1000 - w, cx - w / 2)), Math.max(0, Math.min(600 - h, cy - h / 2)), w, h];
+  }
+  cancelAnimationFrame(vbAnim);
+  const from = vb.slice(), t0 = performance.now(), D = reduceMotion ? 1 : 450;
+  const f = now => {
+    const t = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - t, 3);
+    vb = from.map((v, i) => v + (target[i] - v) * e);
+    svg.setAttribute('viewBox', vb.map(v => v.toFixed(1)).join(' '));
+    if (t < 1) vbAnim = requestAnimationFrame(f);
+  };
+  vbAnim = requestAnimationFrame(f);
+}
+$('#zoomBtn').addEventListener('click', () => {
+  zoomed = !zoomed; $('#zoomBtn').setAttribute('aria-pressed', zoomed);
+  $('#zoomBtn').textContent = zoomed ? '전체 보기' : '확대해서 보기';
+  applyZoom();
+});
+
+/* ===== 정리 시트 ===== */
+function setSheet(on){
+  $('#sheet').classList.toggle('open', on);
+  $('#sheet').setAttribute('aria-hidden', !on);
+}
+$('#sheetBtn').addEventListener('click', () => setSheet(!$('#sheet').classList.contains('open')));
+$('#sheetClose').addEventListener('click', () => setSheet(false));
+
+/* ===== 단계 진행 ===== */
+function updateProgress(){
+  const r = step / (STEPS.length - 1) * 100;
+  $('#pfill').style.width = r + '%'; $('#pknob').style.left = r + '%';
+}
+function updateList(){
+  document.querySelectorAll('.blist li').forEach(li => {
+    li.classList.toggle('done', S.completed.has(li.dataset.k));
+    li.classList.toggle('cur', li.dataset.k === STEPS[step].k);
+  });
+}
+function enterStep(i){
+  step = i; done = false;
+  const st = STEPS[i];
+  const tg = $('#tag'); tg.textContent = st.tag; tg.className = 'tag' + (st.cls ? ' ' + st.cls : '');
+  $('#pc').textContent = `${i + 1} / ${STEPS.length}`;
+  $('#sn').textContent = i + 1;
+  $('#stext').textContent = st.text;
+  $('#hint').textContent = st.hint;
+  const nx = $('#next'); nx.classList.remove('ready', 'blink'); nx.textContent = '다음 단계';
+  setSheet(false);
+  setScene(st.scene, st.focus || (st.scene === 'bat' ? 'all' : null));
+  renderRead(st.k);
+  updateList(); updateWants(); updateProgress();
+  if (st.act === 'sheet'){ setTimeout(() => { if (step === i) setSheet(true); }, reduceMotion ? 0 : 300); complete(true); }
+}
+function complete(silent){
+  if (done) return;
+  done = true;
+  const st = STEPS[step];
+  S.completed.add(st.k);
+  if (!silent && st.ok) toast(st.ok);
+  const nx = $('#next');
+  nx.classList.add('ready');
+  if (step === STEPS.length - 1) nx.textContent = '처음부터 다시';
+  nx.classList.remove('blink'); void nx.offsetWidth; nx.classList.add('blink');
+  updateList(); updateWants();
+}
+$('#next').addEventListener('click', goNext);
+function goNext(){
+  if (!done){ toast('이 단계를 먼저 마치자.'); return; }
+  if (step === STEPS.length - 1){ resetAll(); return; }
+  const k = STEPS[step].k;
+  if (CFG.quizOn && QUIZ[k] && !quizPassed[k]){ openQuiz(k); return; }
+  enterStep(step + 1);
+}
+
+/* ===== 확인 문제 ===== */
+function openQuiz(k){
+  quizK = k;
+  if (!quizPick[k]) quizPick[k] = QUIZ[k][Math.floor(Math.random() * QUIZ[k].length)];
+  const q = quizPick[k];
+  $('#qsub').textContent = READ_NAME[k];
+  $('#qtext').textContent = q.s;
+  $('#qfb').textContent = ''; $('#qfb').className = 'qfb';
+  document.querySelectorAll('.oxb').forEach(b => { b.disabled = false; b.classList.remove('wrong', 'right'); });
+  $('#qGo').hidden = true; quizLock = false;
+  $('#quiz').classList.add('open'); $('#quiz').setAttribute('aria-hidden', 'false');
+  setTimeout(() => document.querySelector('.oxb').focus(), 50);
+}
+function closeQuiz(){
+  $('#quiz').classList.remove('open'); $('#quiz').setAttribute('aria-hidden', 'true');
+}
+document.querySelectorAll('.oxb').forEach(btn => btn.addEventListener('click', () => {
+  const q = quizPick[quizK], fb = $('#qfb');
+  if (btn.dataset.a === q.a){
+    quizPassed[quizK] = true;
+    btn.classList.add('right');
+    document.querySelectorAll('.oxb').forEach(x => { x.disabled = true; x.classList.remove('wrong'); });
+    fb.className = 'qfb ok'; fb.textContent = '맞았다! ' + q.ex;
+    document.querySelectorAll('.qs.show').forEach(x => x.classList.remove('show'));
+    $('#qGo').hidden = false; $('#qGo').focus();
+  } else {
+    /* 틀리면 잠깐 표시한 뒤 창을 닫고, 본문의 관련 문장을 표시해 다시 읽게 한다 */
+    if (quizLock) return;
+    quizLock = true;
+    document.querySelectorAll('.oxb').forEach(x => x.disabled = true);
+    btn.disabled = false; btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong');
+    fb.className = 'qfb no'; fb.textContent = '틀렸다. 본문을 다시 읽어 보자.';
+    setTimeout(() => {
+      closeQuiz();
+      renderRead(quizK);
+      const sen = document.querySelector(`.qs[data-q="${q.ref}"]`);
+      if (sen){ sen.classList.add('show'); sen.scrollIntoView({ block:'center', behavior: reduceMotion ? 'auto' : 'smooth' }); }
+      toast('본문에 표시한 문장을 다시 읽고 [다음 단계]를 누르자.');
+    }, 1100);
+  }
+}));
+$('#qGo').addEventListener('click', () => { closeQuiz(); enterStep(step + 1); });
+
+/* ===== 처음부터 ===== */
+function resetAll(){
+  stopLoop();
+  freshState();
+  busy = false; quizPick = {}; quizPassed = {}; closeQuiz();
+  document.querySelectorAll('.plabel').forEach(l => l.classList.remove('show'));
+  document.querySelectorAll('.call').forEach(c => c.classList.remove('show'));
+  document.querySelectorAll('.valve').forEach(v => v.classList.remove('open'));
+  ['flowH','flowO','flowW'].forEach(f => setFlow(f, false));
+  $('#bulb').classList.remove('lit');
+  $('#ssStack').innerHTML = '';
+  zoomed = false; $('#zoomBtn').setAttribute('aria-pressed', false); $('#zoomBtn').textContent = '확대해서 보기';
+  enterStep(0);
+}
+$('#restart').addEventListener('click', resetAll);
+
+/* ===== 키보드 (앞에서 시연할 때) =====
+   Space·Enter·→ = 다음 단계, R = 처음부터, Esc = 창 닫기 */
+document.addEventListener('keydown', e => {
+  const quizOpen = $('#quiz').classList.contains('open');
+  if (e.key === 'Escape'){
+    if (!quizOpen) setSheet(false);
+    return;
+  }
+  if (quizOpen) return;
+  const onBtn = e.target.closest && e.target.closest('button,li[tabindex]');
+  if ((e.key === ' ' || e.key === 'Enter') && onBtn) return;
+  if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight'){ e.preventDefault(); goNext(); }
+  else if (e.key === 'r' || e.key === 'R') resetAll();
+});
+
+enterStep(0);
+</script>
+</body>
+</html>
